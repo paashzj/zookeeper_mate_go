@@ -55,7 +55,8 @@ func generateZkConfig() error {
 			configProp.Set("server."+strconv.Itoa(i+1), prefix+strconv.Itoa(i)+".zookeeper:2888:3888")
 		}
 		zkIndex := hostname[index+1:]
-		err := ioutil.WriteFile(path.ZooKeeperMyId, []byte(zkIndex), os.FileMode(0666))
+		index, _ = strconv.Atoi(zkIndex)
+		err := ioutil.WriteFile(path.ZooKeeperMyId, []byte(strconv.Itoa(index+1)), os.FileMode(0666))
 		if err != nil {
 			return err
 		}
