@@ -52,7 +52,7 @@ func generateZkConfig() error {
 		index := strings.LastIndex(hostname, "-")
 		prefix := hostname[0:index]
 		for i := 0; i < 3; i++ {
-			configProp.Set("server."+strconv.Itoa(i+1), prefix+strconv.Itoa(i)+".zookeeper:2888:3888")
+			configProp.Set("server."+strconv.Itoa(i+1), prefix+"-"+strconv.Itoa(i)+".zookeeper:2888:3888")
 		}
 		zkIndex := hostname[index+1:]
 		index, _ = strconv.Atoi(zkIndex)
