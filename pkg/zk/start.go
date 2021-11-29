@@ -2,37 +2,29 @@ package zk
 
 import (
 	"github.com/paashzj/gutil"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"zookeeper_mate_go/pkg/config"
 	"zookeeper_mate_go/pkg/path"
+	"zookeeper_mate_go/pkg/util"
 )
 
 func Start() {
-	err := generateZkConfig()
-	if err != nil {
-		logrus.Error("can't start zk ", err)
-	}
 	startZk()
 }
 
 func startZk() {
-	command := exec.Command("/bin/bash", path.ZooKeeperStartScript)
-	err := command.Start()
+	stdout, stderr, err := gutil.CallScript(path.ZooKeeperStartScript)
+	util.Logger().Info("shell result ", zap.String("stdout", stdout), zap.String("stderr", stderr))
 	if err != nil {
-		logrus.Error("start zk server failed ", err)
-	}
-	err = command.Wait()
-	if err != nil {
-		logrus.Error("command wait error ", err)
+		util.Logger().Error("command wait error ", zap.Error(err))
 	}
 }
 
-func generateZkConfig() error {
+func Config() error {
 	configProp := gutil.ConfigProperties{}
 	configProp.Init()
 	configProp.Set("tickTime", "2000")
@@ -44,6 +36,9 @@ func generateZkConfig() error {
 	configProp.Set("4lw.commands.whitelist", "stat,ruok,conf,isro,mntr,srvr")
 	configProp.Set("metricsProvider.className", "org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider")
 	configProp.Set("metricsProvider.exportJvmInfo", "true")
+	if config.TlsEnable {
+		configProp.SetInt("secureClientPort", 2182)
+	}
 	if config.ClusterEnable {
 		configProp.Set("standaloneEnabled", "false")
 		configProp.Set("reconfigEnabled", "false")
