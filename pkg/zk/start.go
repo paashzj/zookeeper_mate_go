@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 	"zookeeper_mate_go/pkg/config"
 	"zookeeper_mate_go/pkg/path"
 	"zookeeper_mate_go/pkg/util"
@@ -14,6 +15,19 @@ import (
 
 func Start() {
 	startZk()
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
+			processExists, err := gutil.ProcessExists("org.apache.zookeeper.server.quorum.QuorumPeerMain")
+			if err != nil {
+				util.Logger().Error("check process exists error ", zap.Error(err))
+				continue
+			}
+			if !processExists {
+				startZk()
+			}
+		}
+	}()
 }
 
 func startZk() {
