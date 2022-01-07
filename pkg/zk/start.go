@@ -69,6 +69,9 @@ func Config() error {
 		if err != nil {
 			return err
 		}
+		if config.QuorumTlsEnable {
+			configProp.SetBool("sslQuorum", true)
+		}
 	}
 	return configProp.Write(path.ZooKeeperConfig)
 }
