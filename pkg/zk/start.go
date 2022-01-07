@@ -71,6 +71,7 @@ func Config() error {
 		}
 		if config.QuorumTlsEnable {
 			configProp.SetBool("sslQuorum", true)
+			configProp.Set("serverCnxnFactory", "org.apache.zookeeper.server.NettyServerCnxnFactory")
 		}
 	}
 	return configProp.Write(path.ZooKeeperConfig)
